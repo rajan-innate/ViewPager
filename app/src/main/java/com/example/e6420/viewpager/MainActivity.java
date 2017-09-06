@@ -6,12 +6,17 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.pixplicity.multiviewpager.MultiViewPager;
 
 public class MainActivity extends FragmentActivity {
 
+    private float offset = -1;
+    private float paddingLeft;
+    private float minScale;
+    private float minAlpha;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +58,25 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        pager.setPageTransformer(false, new ViewPager.PageTransformer() {
 
+            public void transformPage(View page, float position) {
+                if (offset == -1) {
+                    offset = paddingLeft / page.getMeasuredWidth();
+                }
+                if (position < -1) {
+                    page.setAlpha(0);
+                } else if (position <= 1) {
+                    float scaleFactor = Math.max(minScale, 1 - Math.abs(position - offset));
+                    page.setScaleX(scaleFactor);
+                    page.setScaleY(scaleFactor);
+                    float alphaFactor = Math.max(minAlpha, 1 - Math.abs(position - offset));
+                    page.setAlpha(alphaFactor);
+                } else {
+                    page.setAlpha(0);
+                }
+            }
+        });
     }
+
 }
